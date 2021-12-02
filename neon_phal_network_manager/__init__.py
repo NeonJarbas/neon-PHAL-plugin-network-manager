@@ -8,9 +8,8 @@ from dbus_next import BusType
 from dbus_next.aio import MessageBus as DbusMessageBus
 from dbus_next.message import Message as DbusMessage, MessageType as DbusMessageType
 from mycroft_bus_client import Message
+from ovos_plugin_manager.phal import PHALPlugin
 from ovos_utils.log import LOG
-
-from ovos_PHAL import PHALPlugin
 
 
 class ConnectivityState(IntEnum):
@@ -173,7 +172,3 @@ class NetworkManagerEvents(PHALPlugin):
         # check again in self.sleep_time
         time.sleep(self.sleep_time)
         self.bus.emit(message)
-
-
-
-

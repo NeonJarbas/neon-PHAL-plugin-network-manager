@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from setuptools import setup
 
-
 PLUGIN_ENTRY_POINT = 'neon-phal-network-manager=neon_phal_network_manager:NetworkManagerEvents'
 setup(
     name='neon-phal-network-manager',

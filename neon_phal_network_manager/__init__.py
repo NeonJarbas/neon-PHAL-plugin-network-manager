@@ -166,7 +166,7 @@ class NetworkManagerEvents(PHALPlugin):
             # connected to network, but no internet)
             if self.state <= ConnectivityState.NONE:
                 self.bus.emit(message.reply("mycroft.network.connected"))
-            if self.state < ConnectivityState.FULL:
+            if self.state >= ConnectivityState.FULL:
                 self.bus.emit(message.reply("mycroft.internet.disconnected"))
         else:
             # no internet, not connected

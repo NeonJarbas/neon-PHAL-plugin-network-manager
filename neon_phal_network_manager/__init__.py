@@ -175,7 +175,16 @@ class NetworkManagerEvents(PHALPlugin):
             if self.state >= ConnectivityState.NONE:
                 self.bus.emit(message.reply("mycroft.network.disconnected"))
             self.bus.emit(message.reply("enclosure.notify.no_internet"))
+
         self.state = state
+        if self.state == ConnectivityState.FULL:
+            self.bus.emit(message.reply("mycroft.internet.state", {"state": "connected"}))
+        else:
+            self.bus.emit(message.reply("mycroft.internet.state", {"state": "disconnected"}))
+        if self.state > ConnectivityState.NONE:
+            self.bus.emit(message.reply("mycroft.network.state", {"state": "connected"}))
+        else:
+            self.bus.emit(message.reply("mycroft.network.state", {"state": "disconnected"}))
 
     def handle_check(self, message):
         state = self.net_manager.get_state()

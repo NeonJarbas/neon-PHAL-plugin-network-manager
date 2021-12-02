@@ -42,9 +42,7 @@ class NetworkManager:
     """Connects to org.freedesktop.NetworkManager over DBus to
     determine network/internet connectivity.
 
-    This differs from the connected() utility method by relying on the reported
-    state from org.freedesktop.NetworkManager rather than attempting to reach a
-    specific IP address or URL.
+    Taken from mycroft-core
     """
 
     DEFAULT_TIMEOUT = 1.0
@@ -155,21 +153,21 @@ class NetworkManagerEvents(PHALPlugin):
         super().__init__(bus, "network_manager")
         self.sleep_time = 60
         self.net_manager = NetworkManager()
-        self.bus.on("ovos.phal.internet_check", self.handle_check)
-        self.bus.emit(Message("ovos.phal.internet_check"))
+        self.bus.on("ovos.PHAL.internet_check", self.handle_check)
+        self.bus.emit(Message("ovos.PHAL.internet_check"))
 
     def handle_check(self, message):
         state = self.net_manager.get_state()
         if state == ConnectivityState.FULL:
             # has internet
-            self.bus.emit(message.reply("ovos.phal.connectivity.internet.connected"))
+            self.bus.emit(message.reply("ovos.PHAL.connectivity.internet.connected"))
             self.bus.emit(message.reply("mycroft.internet.connected"))
         elif state > ConnectivityState.NONE:
             # connected to network, but no internet
-            self.bus.emit(message.reply("ovos.phal.connectivity.network.connected"))
+            self.bus.emit(message.reply("ovos.PHAL.connectivity.network.connected"))
         else:
             # no internet, not connected
-            self.bus.emit(message.reply("ovos.phal.connectivity.disconnected"))
+            self.bus.emit(message.reply("ovos.PHAL.connectivity.disconnected"))
             self.bus.emit(message.reply("enclosure.notify.no_internet"))
 
         # check again in self.sleep_time

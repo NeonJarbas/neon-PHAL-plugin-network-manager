@@ -151,17 +151,18 @@ class NetworkManagerEvents(PHALPlugin):
     def __init__(self, bus=None):
         super().__init__(bus, "network_manager")
         self.sleep_time = 60
+        self.state = ConnectivityState.UNKNOWN
         self.net_manager = NetworkManager()
         self.bus.on("ovos.PHAL.internet_check", self.handle_check)
         self.bus.emit(Message("ovos.PHAL.internet_check"))
 
-    def handle_check(self, message):
-        state = self.net_manager.get_state()
-        if state == ConnectivityState.FULL:
+    def update_state(self, state, message):
+        self.state = state
+        if self.state == ConnectivityState.FULL:
             # has internet
             self.bus.emit(message.reply("ovos.PHAL.connectivity.internet.connected"))
             self.bus.emit(message.reply("mycroft.internet.connected"))
-        elif state > ConnectivityState.NONE:
+        elif self.state > ConnectivityState.NONE:
             # connected to network, but no internet
             self.bus.emit(message.reply("ovos.PHAL.connectivity.network.connected"))
         else:
@@ -169,6 +170,13 @@ class NetworkManagerEvents(PHALPlugin):
             self.bus.emit(message.reply("ovos.PHAL.connectivity.disconnected"))
             self.bus.emit(message.reply("enclosure.notify.no_internet"))
 
+    def handle_check(self, message):
+        state = self.net_manager.get_state()
+
+        if state != self.state:
+            self.update_state(state, message)
+
         # check again in self.sleep_time
         time.sleep(self.sleep_time)
         self.bus.emit(message)
+
